@@ -48,8 +48,6 @@ include("header.php");  // Include header
                 <div class="card-body">
                     <p>This section allows you to register a new student in the system. Click the button below to proceed with the registration process.</p>
                     <!-- Button that redirects to the student registration page -->
-                    <a href="student/register.php" class="btn btn-primary">Register New Student</a>
-
                 </div>
             </div>
         </div>
