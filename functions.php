@@ -135,6 +135,6 @@ if (!isset($_SESSION['subjects'])) {
 // Process the form submission (add or edit subject)
 process_subject_form();
 
-// Footer AllDone
+// Function All Done
 ?>
 
