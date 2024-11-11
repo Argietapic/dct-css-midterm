@@ -3,7 +3,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f8f9fa;
+    background-color: #387fc6;
 }
 .container {
     text-align: center;
@@ -13,6 +13,6 @@ body {
 }
 .logout-btn {
     position: absolute;
-    top: 20px;
+    top: 100px;
     right: 20px;
 }
