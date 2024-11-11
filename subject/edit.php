@@ -1,5 +1,5 @@
 <?php
-// Start session only if not already started
+// Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -90,7 +90,19 @@ function process_subject_form() {
         $subjectName = $_POST['subjectName'];
 
         // Validate input and add the subject or edit an existing one
-        if (!empty($subjectCode) && !empty($subjectName)) {
+        if (empty($subjectCode)) {
+            $error_message = "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                                  <strong>System Error </strong><br><ul>
+                                    <li>Subject Code is required!</li></ul>
+                                 <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                              </div>";
+        } elseif (empty($subjectName)) {
+            $error_message = "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                                  <strong>System Error </strong><br><ul>
+                                    <li>Subject Name is required!</li></ul>
+                                 <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                              </div>";
+        } else {
             if (isset($_POST['editSubject'])) { // If we are editing
                 $editIndex = $_POST['editSubject']; // Get index of the subject to edit
                 $_SESSION['subjects'][$editIndex] = ['code' => $subjectCode, 'name' => $subjectName];
@@ -116,13 +128,12 @@ function process_subject_form() {
                     $_SESSION['subjects'][] = ['code' => $subjectCode, 'name' => $subjectName];
                 }
             }
-        } else {
-            $error_message = "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                                  <strong>System Error </strong><br><ul>
-                                    <li>Subject Code is Required!</li>
-                                    <li>Subject Name is Required!</li></ul>
-                                 <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                              </div>";
+
+            // Redirect to add.php after successful form submission (edit or add)
+            if (empty($error_message)) {
+                header("Location: add.php"); // Redirect to the Add Subject page
+                exit;
+            }
         }
     }
 }
@@ -136,3 +147,65 @@ if (!isset($_SESSION['subjects'])) {
 process_subject_form();
 ?>
 
+<html>
+<head>
+    <title>Edit Subject</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .breadcrumb {
+            background-color: #e9ecef;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Edit Subject</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="add.php">Add Subject</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Subject</li>
+            </ol>
+        </nav>
+
+        <!-- Show the error message if there is one -->
+        <?= $error_message; ?>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="">
+                    <?php
+                    // Get the subject index to edit (e.g., from URL query parameter)
+                    $editIndex = isset($_GET['editIndex']) ? $_GET['editIndex'] : 0;
+                    $subject = $_SESSION['subjects'][$editIndex];
+                    ?>
+
+                    <div class="mb-3">
+                        <label for="subjectId" class="form-label">Subject Code</label>
+                        <input type="text" class="form-control" id="subjectCode" name="subjectCode" value="<?= $subject['code'] ?>" >
+                        <input type="hidden" name="editSubject" value="<?= $editIndex ?>"> <!-- Hidden input to track the subject index -->
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subjectName" class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="subjectName" name="subjectName" placeholder="<?= $subject['name'] ?>" >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Subject</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php include("../footer.php"); ?>
+</body>
+</html>
